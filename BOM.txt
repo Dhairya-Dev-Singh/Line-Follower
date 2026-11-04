@@ -1,0 +1,8 @@
+Material : Link
+1. ESP 32 : https://amzn.in/d/0bTSpH7s
+2. TB6612FNG : https://amzn.in/d/08cWcsD8
+3. QTR-8A Reflectance Sensor Array : https://www.pololu.com/product/960
+4. 18650 x 2 Battery Holder, with 2000mAh 3.7V Li-ion Rechargeable Battery : https://amzn.in/d/0bKkSWNi
+5. N20 3V-9V 600 RPM 14mm shaft Gear Motor : https://amzn.in/d/0fVJQNvC
+6. LM2596 Dc to Dc Buck Converter : https://amzn.in/d/06CS5DHv
+7. Jumper Wire Cable (Male To Male, Female To Female, Male To Female) : https://amzn.in/d/0he5ZxW2
