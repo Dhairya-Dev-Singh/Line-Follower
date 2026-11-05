@@ -216,3 +216,11 @@ Test left and right hand rules
 Test DFS on simple non-looping maze
 
 Once DFS is working reliably add graph and shortest path logic.
+
+
+
+
+CAD model
+
+<img width="1470" height="956" alt="Screenshot 2026-11-04 at 3 58 40 PM" src="https://github.com/user-attachments/assets/87d912c9-c08f-4041-b44f-044b0d22f7ad" />
+
