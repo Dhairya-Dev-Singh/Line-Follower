@@ -1,226 +1,154 @@
-Line Follower Robot
-This is the autonomous robot designed for the maze solving. This robot currently follows a line path, identifies corners and junctions, and is being developed in stages to support exploring a maze.
+# Line Follower Robot
 
-It is currently using the ESP32, QTR-8RC sensor array and TB6612FNG motor driver. We are also using geared DC motors.
+This is an autonomous robot being developed for a maze-solving competition. The current version follows a line, handles corners and junctions, and is being developed step by step toward complete maze exploration.
 
+The robot uses an ESP32, a QTR-8RC sensor array, a TB6612FNG motor driver, and two geared DC motors.
 
- Features
- 
-Follows a black line on a light/white background
+![Line follower robot](https://github.com/user-attachments/assets/aca75f50-7bf9-4db8-b976-befde283ada7)
 
-Uses PID turning to follow line
+## Features
 
-Automatically calibrates sensors
+- Follows a black line on a light or white surface
+- Uses PD control for steering
+- Automatically calibrates the sensors at startup
+- Starts only after the push button is pressed
+- Recovers when the line is temporarily lost
+- Supports left-hand rule and right-hand rule navigation
+- Includes an experimental DFS mode for maze exploration
+- Stores basic exploration events in memory during DFS testing
 
-Only starts moving when button is pressed
+## Hardware
 
-Robust to losing line
+- ESP32-WROOM-32 development board
+- QTR-8RC 8-channel reflectance sensor array
+- TB6612FNG dual motor driver
+- Two geared DC motors without encoders
+- Two wheels and one caster wheel
+- Battery pack
+- Main power switch
+- Push button connected to GPIO15
+- Chassis within the competition size limits
+- Jumper wires and connectors
+- Screws, spacers, and motor mounts
 
-Can follow left hand rule, right hand rule and experimental DFS
+## Wiring diagram
 
-Basic exploration events are stored in memory when using DFS.
+![Complete wiring diagram](https://github.com/user-attachments/assets/c8efb6c1-3ef2-4c9a-bc6e-3ff2cd838459)
 
+A vector version of the wiring diagram is also available in the repository:
 
+## Connections
 
-Hardware
+### QTR-8RC sensor array
 
-ESP32-WROOM-32 dev board
+The physical sensor order is S1 on the right and S8 on the left.
 
-QTR-8RC Sensor Array (8 Channel Reflective Sensor)
+| Sensor pin | ESP32 pin |
+|---|---:|
+| S1, rightmost | GPIO32 |
+| S2 | GPIO33 |
+| S3 | GPIO18 |
+| S4 | GPIO19 |
+| S5 | GPIO4 |
+| S6 | GPIO21 |
+| S7 | GPIO23 |
+| S8, leftmost | GPIO22 |
+| VCC | 3.3 V |
+| GND | Common GND |
 
-TB6612FNG Motor Driver
+In the code, the sensor order is reversed so the values are read from left to right: S8, S7, S6, S5, S4, S3, S2, S1.
 
-2 geared DC motors (No Encoders)
+### TB6612FNG motor driver
 
-2 wheels and 1 caster wheel
+| TB6612FNG pin | ESP32 connection |
+|---|---:|
+| PWMA | GPIO25 |
+| AIN1 | GPIO26 |
+| AIN2 | GPIO27 |
+| PWMB | GPIO14 |
+| BIN1 | GPIO12 |
+| BIN2 | GPIO13 |
+| STBY | 3.3 V |
+| VCC | 3.3 V |
+| VM | Switched battery positive |
+| GND | Common GND |
 
-Battery pack
 
-Power switch
+### Power connections
 
-Push-button connected to GPIO15
+The following points must share a common ground:
 
-Chassis (Competition size limits)
+- Battery negative
+- ESP32 GND
+- QTR-8RC GND
+- TB6612FNG GND
+- Push-button GND
 
-Jumper cables
+Power the ESP32 using USB or a suitable regulated power supply. Do not connect raw battery voltage directly to the ESP32 3.3 V pin.
 
-Connectors
+## Setup
 
-Screws
+1. Install the Arduino IDE.
+2. Install the ESP32 board package.
+3. Select the correct ESP32 board, usually **ESP32 Dev Module**.
+4. Install the `QTRSensors` library through the Arduino Library Manager.
+5. Connect the ESP32 and select the correct port.
+6. Upload the required line-following or maze-solving sketch.
+7. Place the robot over the line and let the automatic calibration finish.
+8. Press the button connected to GPIO15 to start the robot.
 
-Spacers
+The current setup is for a black line on a light surface. If the competition arena uses a white line on a black surface, the sensor-reading mode in the code must be changed.
 
-Motor Mounts
+## Algorithms
 
+### Basic line following
 
+The robot estimates the position of the line using all eight sensors. PD control then adjusts the speed of the two motors to keep the robot centred on the line.
 
-Full wiring diagram:
+### Left-hand and right-hand rules
 
+At a junction, the robot selects a direction according to a fixed priority:
 
+```text
+Left-hand rule:  Left → Straight → Right → U-turn
+Right-hand rule: Right → Straight → Left → U-turn
+```
 
-Wiring
+These rules are useful for initial maze testing, but they do not guarantee the shortest path.
 
+### DFS exploration
 
+The experimental DFS version explores branches recursively and backtracks after reaching a dead end or completing a branch. It is currently intended for testing the robot's exploration and backtracking behaviour.
 
-QTR-8RC Sensor
+The official maze contains loops, and the current robot does not have encoders or dedicated node markers. Because of this, identifying previously visited junctions reliably is still an open part of the project.
 
+### Shortest path
 
+Graph storage and A* shortest-path logic will be added after the basic line following and DFS behaviour are reliable.
 
-Sensor Order: S1 (Right), S8 (Left)
+## Testing plan
 
- Sensor Pin | ESP32 Pin 
+The robot is being tested in the following order:
 
- S1 (Right) | GPIO32 
+1. Test each motor individually.
+2. Confirm that both motors move forward together.
+3. Check QTR sensor readings on black and white surfaces.
+4. Test automatic calibration.
+5. Tune basic line following on straight sections.
+6. Test gentle curves and 90-degree turns.
+7. Test junction detection on a small practice track.
+8. Test left-hand and right-hand rule navigation.
+9. Test DFS on a simple maze without loops.
+10. Add graph and shortest-path logic after DFS is stable.
 
- S2 | GPIO33 
+## CAD and mechanical design
 
- S3 | GPIO18 
+### Rough paper sketch
 
- S4 | GPIO19 
+![Rough robot sketch](https://github.com/user-attachments/assets/1fd800e3-ac10-4623-861c-8dc4847e2601)
 
- S5 | GPIO4 
+### CAD development
 
- S6 | GPIO21 
+![CAD model](https://github.com/user-attachments/assets/87d912c9-c08f-4041-b44f-044b0d22f7ad)
 
- S7 | GPIO23 
-
- S8 (Left) | GPIO22 
-
- VCC | 3.3V 
-
- GND | GND 
-
-The order of sensors when reading is reversed so that S8 is the left most and S1 is the right most.
-
-
-
-TB6612FNG Motor Driver
-
-
-
-TB6612FNG Pin | ESP32 Connection 
-
- PWMA | GPIO25 
-
- AIN1 | GPIO26 
-
- AIN2 | GPIO27 
-
- PWMB | GPIO14 
-
- BIN1 | GPIO12 
-
- BIN2 | GPIO13 
-
- STBY | 3.3V 
-
- VCC | 3.3V 
-
- VM | Positive of battery (Switch) 
-
- GND | GND 
-
-Motor Order: AO1/AO2 = Right, BO1/BO2 = Left
-
-In the code you will have MOTORS_SWAPPED set to true.
-
-
-
-Power Button
-
-
-
- Button Pin 1 | ESP32 GPIO15 
-
- Button Pin 2 | GND 
-
-Pin GPIO15 is set to have the internal pull up resistor enabled. So button will be high when not pressed.
-
-
-
-Power
-
-
-
-Battery Positive | Power Switch | TB6612 VM 
-
-Battery Negative | GND | GND |
-
-Battery Negative, ESP32 GND, Sensor GND, Motor Driver GND, Button GND all need connecting together.
-
-ESP32 needs to be powered using USB or a suitable power supply. 
-
-
-
-Setup
-
-
-
-Install Arduino IDE
-
-Install ESP32 Board Package
-
-Select the correct ESP32 board (usually ESP32 Dev Module)
-
-Install the QTRSensors library using the Arduino Library Manager
-
-Connect ESP32 and select the correct port
-
-Upload the required sketch for line following or maze solving
-
-Place robot on line to allow calibration to happen
-
-Press the button connected to GPIO15
-
-Currently we are using a black line on a light surface for testing. If the arena is using a white line on a black surface then the sensors will need to be set to read in that mode.
-
-
-
-Algorithms
-
-Basic Line Following
-
-Robot finds the position of the line using the 8 sensors and uses PD control to change the speed of the 2 motors.
-
-
-
- Left Hand Rule & Right Hand Rule
-
-Robot will decide which way to go at a junction based on a priority list:
-
-Left Hand Rule: Left > Straight > Right > U-Turn
-
-Right Hand Rule: Right > Straight > Left > U-Turn
-
-These are useful for testing the maze with the robot but won’t give the shortest path.
-
-
- Testing Recommendations
-
-Test each motor individually
-
-Test both motors are moving together forwards
-
-Test QTR sensor readings on black and white surfaces
-
-Test auto-calibration
-
-Fine tune basic line following on straight lines
-
-Test on gentle curves and 90 degree turns
-
-Test junction detection on small test track
-
-Test left and right hand rules
-
-Test DFS on simple non-looping maze
-
-Once DFS is working reliably add graph and shortest path logic.
-
-
-
-
-CAD model
-
-<img width="1470" height="956" alt="Screenshot 2026-11-04 at 3 58 40 PM" src="https://github.com/user-attachments/assets/87d912c9-c08f-4041-b44f-044b0d22f7ad" />
-
+![Updated CAD model](https://github.com/user-attachments/assets/f9b46c34-9d3e-4519-bb60-989d0f8e3f0e)
